@@ -17,14 +17,16 @@ class dstat_plugin(dstat):
 
     def extract(self):
         for name in self.vars:
-            for l in open(os.path.join('/proc/fs/lustre/llite', name, 'stats')).splitlines():
+            read = 0; write = 0
+            for line in open(os.path.join('/proc/fs/lustre/llite', name, 'stats')).readlines():
+                l = line.split()
                 if len(l) < 6: continue
                 if l[0] == 'read_bytes':
                     read = long(l[6])
                 elif l[0] == 'write_bytes':
                     write = long(l[6])
             self.set2[name] = (read, write)
-
+            if not self.set1[name]: self.set1[name] = (0, 0)
             self.val[name] = map(lambda x, y: (y - x) * 1.0 / elapsed, self.set1[name], self.set2[name])
 
         if step == op.delay:
