@@ -3,6 +3,7 @@
 class dstat_plugin(dstat):
     def __init__(self):
         self.nick = ('read', 'write')
+        self.cols = 2 
 
     def check(self):
         if not os.path.exists('/proc/fs/lustre/llite'):
@@ -17,8 +18,9 @@ class dstat_plugin(dstat):
 
     def extract(self):
         for name in self.vars:
+
             read = 0; write = 0
-            for line in open(os.path.join('/proc/fs/lustre/llite', name, 'stats')).readlines():
+            for line in dopen(os.path.join('/proc/fs/lustre/llite', name, 'stats')).readlines():
                 l = line.split()
                 if len(l) < 6: continue
                 if l[0] == 'read_bytes':
